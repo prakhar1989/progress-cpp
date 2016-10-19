@@ -6,15 +6,23 @@
 
 class ProgressBar {
 private:
+    /* ticks completed */
     int current;
-    const int barWidth;
+
     const int barTotal;
+    const int barWidth;
     const char completeChar;
     const char incompleteChar;
     const std::chrono::steady_clock::time_point start_time;
 public:
+    ProgressBar(int total, int width):
+            barTotal {total}, barWidth {width}, completeChar {'='},
+            incompleteChar {' '}, start_time {std::chrono::steady_clock::now()}
+    {
+        current = 0;
+    }
     ProgressBar(int total, int width, char complete, char incomplete) :
-      barTotal {total}, barWidth {width}, completeChar {complete},
+            barTotal {total}, barWidth {width}, completeChar {complete},
       incompleteChar {incomplete}, start_time {std::chrono::steady_clock::now()}
     {
         current = 0;
