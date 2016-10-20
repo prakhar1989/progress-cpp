@@ -11,7 +11,7 @@ int main() {
      * a width of 70, shows `=` to indicate completion
      * and a blank space for incomplete
      */
-    ProgressBar progressBar(total, 70, '=', ' ');
+    ProgressBar progressBar(total, 70, '#', '-');
 
     for (int i = 0; i < total; i++) {
         ++progressBar; // record the tick
