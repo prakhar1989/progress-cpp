@@ -142,9 +142,7 @@ public:
 
 	    ss<<" (" << static_cast<std::size_t>(ticks_per_second) << " t/s)";
 
-	    while(ss.str().size() < bar_width)
-	    	ss<<" ";
-	    std::cout<< ss.str() <<"\\33[2K\r"<<std::flush;
+	    std::cout<< ss.str() <<"\033[2K\r"<<std::flush;
     }
 
     void done() const
