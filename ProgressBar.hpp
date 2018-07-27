@@ -6,6 +6,7 @@
 #include <ios>
 #include <iomanip>
 #include <limits>
+#include <sstream>
 
 template < typename IntType>
 class ProgressBar {
@@ -14,11 +15,12 @@ private:
     IntType ticks = 0;
     const IntType total_ticks;
     const IntType bar_width;
+    const IntType console_width;
     const char complete_char = '=';
     const char incomplete_char = ' ';
     const std::chrono::steady_clock::time_point start_time = std::chrono::steady_clock::now();
 
-    static void output_time(double seconds){
+    static void output_time(std::stringstream & ss, double seconds){
     	std::size_t s_in_h(60 * 60), s_in_m(60), m_in_h(60);
 
 	    IntType hours_rem = seconds / s_in_h;
@@ -28,31 +30,31 @@ private:
 	    IntType seconds_rem = seconds - ( (hours_rem * s_in_h) + (minutes_rem * s_in_m));
 
 	    std::ios init(nullptr), time_fmt(nullptr);
-	    init.copyfmt(std::cout);
-	    std::cout<< std::setfill('0') << std::setw(2);
-	    time_fmt.copyfmt(std::cout);
+	    init.copyfmt(ss);
+	    ss<< std::setfill('0') << std::setw(2);
+	    time_fmt.copyfmt(ss);
 		//hours
-	    std::cout.copyfmt(time_fmt);
-	    std::cout << hours_rem;
-	    std::cout.copyfmt(init);
+	    ss.copyfmt(time_fmt);
+	    ss << hours_rem;
+	    ss.copyfmt(init);
 	    //minutes
-	    std::cout << ":";
-	    std::cout.copyfmt(time_fmt);
-	    std::cout << minutes_rem;
-	    std::cout.copyfmt(init);
+	    ss << ":";
+	    ss.copyfmt(time_fmt);
+	    ss << minutes_rem;
+	    ss.copyfmt(init);
 	    //seconds
-	    std::cout <<":";
-	    std::cout.copyfmt(time_fmt);
-	    std::cout << seconds_rem;
+	    ss <<":";
+	    ss.copyfmt(time_fmt);
+	    ss << seconds_rem;
 	    //restore format
-	    std::cout.copyfmt(init);
+	    ss.copyfmt(init);
     }
 
 public:
-    ProgressBar(IntType total, IntType width, char complete, char incomplete) :
-            max_limit(std::numeric_limits<IntType>().max()), total_ticks {total}, bar_width {width}, complete_char {complete}, incomplete_char {incomplete} {}
+    ProgressBar(IntType total, IntType width, char complete, char incomplete, IntType console_width=80) :
+            max_limit(std::numeric_limits<IntType>().max()), total_ticks {total}, bar_width {width}, console_width(console_width), complete_char {complete}, incomplete_char {incomplete} {}
 
-    ProgressBar(IntType total, IntType width) : max_limit(std::numeric_limits<IntType>().max()), total_ticks {total}, bar_width {width} {}
+    ProgressBar(IntType total, IntType width, IntType console_width=80) : max_limit(std::numeric_limits<IntType>().max()), total_ticks {total}, bar_width {width}, console_width(console_width) {}
 
 	ProgressBar & operator++() {
     	if(ticks != max_limit){
@@ -114,28 +116,35 @@ public:
 	    double remaining_ticks = total_ticks - ticks;
 	    double total_seconds_rem = remaining_ticks / ticks_per_second;
 
-        std::cout << "[";
+	    std::stringstream ss;
+
+        ss << "[";
 
         for (IntType i = 0; i < bar_width; ++i) {
-            if (i < pos) std::cout << complete_char;
-            else if (i == pos) std::cout << ">";
-            else std::cout << incomplete_char;
+            if (i < pos) ss << complete_char;
+            else if (i == pos) ss << ">";
+            else ss << incomplete_char;
         }
 
 
-        std::cout << "] " << static_cast<IntType>(progress * 100.0) << "% ";
 
-        std::cout << ticks << " / " << total_ticks << " ticks ";
+	    ss << "] " << static_cast<IntType>(progress * 100.0) << "% ";
 
-	    ProgressBar::output_time(seconds);
+	    ss << ticks << " / " << total_ticks << " ticks ";
 
-        std::cout<<" {";
-	    ProgressBar::output_time(total_seconds_rem);
-	    std::cout <<" remaining}";
+	    ProgressBar::output_time(ss, seconds);
 
-	    std::cout<<" (" << static_cast<std::size_t>(ticks_per_second) << " t/s)";
+	    ss<<" {";
 
-	    std::cout<<"\r"<<std::flush;
+	    ProgressBar::output_time(ss, total_seconds_rem);
+
+	    ss <<" remaining}";
+
+	    ss<<" (" << static_cast<std::size_t>(ticks_per_second) << " t/s)";
+
+	    while(ss.str().size() < bar_width)
+	    	ss<<" ";
+	    std::cout<< ss.str() <<"\r"<<std::flush;
     }
 
     void done() const
