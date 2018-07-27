@@ -142,7 +142,7 @@ public:
 
 	    ss<<" (" << static_cast<std::size_t>(ticks_per_second) << " t/s)";
 
-	    std::cout<< ss.str() <<"\033[2K\r"<<std::flush;
+	    std::cout<< "\033[2K\r"<< ss.str() <<std::flush;
     }
 
     void done() const
