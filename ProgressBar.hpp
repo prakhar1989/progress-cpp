@@ -128,7 +128,7 @@ public:
 	    ProgressBar::output_time(total_seconds_rem);
 	    std::cout <<" remaining}";
 
-	    std::cout<<" (" << ticks_per_second << " t/s)";
+	    std::cout<<" (" << static_cast<std::size_t>(ticks_per_second) << " t/s)";
 
 	    std::cout<<"\r"<<std::flush;
     }
