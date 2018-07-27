@@ -50,10 +50,10 @@ private:
     }
 
 public:
-    ProgressBar(IntType total, IntType width, char complete, char incomplete, IntType console_width=80) :
+    ProgressBar(IntType total, IntType width, char complete, char incomplete) :
             max_limit(std::numeric_limits<IntType>().max()), total_ticks {total}, bar_width {width}, complete_char {complete}, incomplete_char {incomplete} {}
 
-    ProgressBar(IntType total, IntType width, IntType console_width=80) : max_limit(std::numeric_limits<IntType>().max()), total_ticks {total}, bar_width {width} {}
+    ProgressBar(IntType total, IntType width) : max_limit(std::numeric_limits<IntType>().max()), total_ticks {total}, bar_width {width} {}
 
 	ProgressBar & operator++() {
     	if(ticks != max_limit){
