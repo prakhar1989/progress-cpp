@@ -117,7 +117,7 @@ public:
             else std::cout << incomplete_char;
         }
         double seconds = static_cast<double>(time_elapsed) / 1000.0;
-        double ticks_per_second = ticks / seconds;
+        double ticks_per_second = static_cast<double>(ticks) / seconds;
         double total_seconds_rem = static_cast<double>(total_ticks-ticks) / ticks_per_second;
 
         std::cout << "] " << static_cast<IntType>(progress * 100.0) << "% ";
