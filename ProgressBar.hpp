@@ -103,11 +103,16 @@ public:
 
     void display() const
     {
-	    double progress = (double) ticks / total_ticks;
+	    double progress = static_cast<double>(ticks) / static_cast<double>(total_ticks);
 	    IntType pos = (IntType) (bar_width * progress);
 
         std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
         auto time_elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now-start_time).count();
+
+        double seconds = static_cast<double>(time_elapsed) / 1000.0;
+	    double ticks_per_second = static_cast<double>(ticks) / seconds;
+	    double remaining_ticks = total_ticks - ticks;
+	    double total_seconds_rem = remaining_ticks / ticks_per_second;
 
         std::cout << "[";
 
@@ -116,11 +121,11 @@ public:
             else if (i == pos) std::cout << ">";
             else std::cout << incomplete_char;
         }
-        double seconds = static_cast<double>(time_elapsed) / 1000.0;
-        double ticks_per_second = static_cast<double>(ticks) / seconds;
-        double total_seconds_rem = static_cast<double>(total_ticks-ticks) / ticks_per_second;
+
 
         std::cout << "] " << static_cast<IntType>(progress * 100.0) << "% ";
+
+        std::cout << ticks << " / " << total_ticks << " ticks ";
 
 	    ProgressBar::output_time(seconds);
 
