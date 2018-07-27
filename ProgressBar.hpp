@@ -144,7 +144,7 @@ public:
 
 	    while(ss.str().size() < bar_width)
 	    	ss<<" ";
-	    std::cout<< ss.str() <<"\r"<<std::flush;
+	    std::cout<< ss.str() <<"\\33[2K\r"<<std::flush;
     }
 
     void done() const
