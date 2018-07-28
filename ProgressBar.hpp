@@ -149,6 +149,11 @@ public:
         display();
         std::cout << std::endl;
     }
+	
+	void reset() {
+		start_time = std::chrono::steady_clock::now();
+		ticks = 0;
+	}
 };
 
 #endif //PROGRESSBAR_PROGRESSBAR_HPP
