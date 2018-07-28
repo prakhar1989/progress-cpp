@@ -116,7 +116,7 @@ public:
 	    double total_seconds_rem = remaining_ticks / ticks_per_second;
 
 	    std::stringstream ss;
-
+	    ss << "\033[2K" << "\r";
         ss << "[";
 
         for (IntType i = 0; i < bar_width; ++i) {
@@ -141,8 +141,7 @@ public:
 
 	    ss<<" (" << static_cast<std::size_t>(ticks_per_second) << " t/s)";
 
-	    std::cout<< "\033[2K"<<std::flush;
-		std::cout<<"\r" << ss.str() << std::flush;
+	    std::cout<< ss.str() << std::flush;
     }
 
     void done() const
