@@ -17,7 +17,7 @@ private:
     const IntType bar_width;
     const char complete_char = '=';
     const char incomplete_char = ' ';
-    const std::chrono::steady_clock::time_point start_time = std::chrono::steady_clock::now();
+    std::chrono::steady_clock::time_point start_time = std::chrono::steady_clock::now();
 
     static void output_time(std::stringstream & ss, double seconds){
     	std::size_t s_in_h(60 * 60), s_in_m(60), m_in_h(60);
