@@ -20,7 +20,7 @@ private:
     std::chrono::steady_clock::time_point start_time = std::chrono::steady_clock::now();
 
     static void output_time(std::stringstream & ss, double seconds){
-    	std::size_t s_in_h(60 * 60), s_in_m(60), m_in_h(60);
+    	std::size_t s_in_h(60 * 60), s_in_m(60)/*, m_in_h(60)*/;
 
 	    IntType hours_rem = seconds / s_in_h;
 
