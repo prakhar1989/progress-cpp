@@ -84,6 +84,9 @@ public:
 	template < typename NumberType >
 	void add_progress( NumberType prog){
     	if( prog < 0){ remove_progress(-prog);};
+    	if(ticks==0){
+    	    reset();//try to reduce impact of any setup/allocation on ticks/sec
+    	}
     	IntType dist_from_limit = max_limit - ticks;
     	if( prog <= dist_from_limit ){
     		ticks = ticks + prog;
@@ -94,6 +97,9 @@ public:
 	template < typename NumberType >
     void remove_progress( NumberType prog){
 		if( prog < 0){ add_progress(-prog);};
+        if(ticks==0){
+            reset();//try to reduce impact of any setup/allocation on ticks/sec
+        }
 	    IntType dist_from_limit = ticks - 0;
 	    if( prog <= dist_from_limit ){
 	    	ticks = ticks - prog;
@@ -134,12 +140,15 @@ public:
 	    ProgressBar::output_time(ss, seconds);
 
 	    ss<<" {";
-
-	    ProgressBar::output_time(ss, total_seconds_rem);
+        if(ticks) {
+            ProgressBar::output_time(ss, total_seconds_rem);
+        } else {
+            ss << "??:??:??";
+        }
 
 	    ss <<" remaining}";
 
-	    ss<<" (" << static_cast<std::size_t>(ticks_per_second) << " t/s)";
+	    ss<<" (" << static_cast<std::size_t>(ticks ? ticks_per_second : 0.0) << " t/s)";
 
 	    std::cout<< ss.str() << std::flush;
     }
