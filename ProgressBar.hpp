@@ -3,43 +3,154 @@
 
 #include <chrono>
 #include <iostream>
+#include <ios>
+#include <iomanip>
+#include <limits>
+#include <sstream>
 
+template < typename IntType>
 class ProgressBar {
 private:
-    unsigned int ticks = 0;
-
-    const unsigned int total_ticks;
-    const unsigned int bar_width;
+	IntType max_limit;
+    IntType ticks = 0;
+    const IntType total_ticks;
+    const IntType bar_width;
     const char complete_char = '=';
     const char incomplete_char = ' ';
-    const std::chrono::steady_clock::time_point start_time = std::chrono::steady_clock::now();
+    std::chrono::steady_clock::time_point start_time = std::chrono::steady_clock::now();
+
+    static void output_time(std::stringstream & ss, double seconds){
+    	std::size_t s_in_h(60 * 60), s_in_m(60)/*, m_in_h(60)*/;
+
+	    IntType hours_rem = seconds / s_in_h;
+
+	    IntType minutes_rem = ( seconds - ( hours_rem * s_in_h) ) / s_in_m ;
+
+	    IntType seconds_rem = seconds - ( (hours_rem * s_in_h) + (minutes_rem * s_in_m));
+
+	    std::ios init(nullptr), time_fmt(nullptr);
+	    init.copyfmt(ss);
+	    ss<< std::setfill('0') << std::setw(2);
+	    time_fmt.copyfmt(ss);
+		//hours
+	    ss.copyfmt(time_fmt);
+	    ss << hours_rem;
+	    ss.copyfmt(init);
+	    //minutes
+	    ss << ":";
+	    ss.copyfmt(time_fmt);
+	    ss << minutes_rem;
+	    ss.copyfmt(init);
+	    //seconds
+	    ss <<":";
+	    ss.copyfmt(time_fmt);
+	    ss << seconds_rem;
+	    //restore format
+	    ss.copyfmt(init);
+    }
 
 public:
-    ProgressBar(unsigned int total, unsigned int width, char complete, char incomplete) :
-            total_ticks {total}, bar_width {width}, complete_char {complete}, incomplete_char {incomplete} {}
+    ProgressBar(IntType total, IntType width, char complete, char incomplete) :
+            max_limit(std::numeric_limits<IntType>().max()), total_ticks {total}, bar_width {width}, complete_char {complete}, incomplete_char {incomplete} {}
 
-    ProgressBar(unsigned int total, unsigned int width) : total_ticks {total}, bar_width {width} {}
+    ProgressBar(IntType total, IntType width) : max_limit(std::numeric_limits<IntType>().max()), total_ticks {total}, bar_width {width} {}
 
-    unsigned int operator++() { return ++ticks; }
+	ProgressBar & operator++() {
+    	if(ticks != max_limit){
+		    ++ticks;
+    	}
+    	return *this;
+    }
+
+	const ProgressBar operator++(int){
+		ProgressBar tmp = *this;
+		++(*this);
+		return tmp;
+    }
+
+	ProgressBar & operator--(){
+		if(ticks != 0) {
+			--ticks;
+		}
+		return *this;
+    }
+
+	const ProgressBar operator--(int){
+		ProgressBar tmp = *this;
+		--(*this);
+		return tmp;
+	}
+
+	template < typename NumberType >
+	void add_progress( NumberType prog){
+    	if( prog < 0){ remove_progress(-prog);};
+    	if(ticks==0){
+    	    reset();//try to reduce impact of any setup/allocation on ticks/sec
+    	}
+    	IntType dist_from_limit = max_limit - ticks;
+    	if( prog <= dist_from_limit ){
+    		ticks = ticks + prog;
+    	} else {
+    		ticks = max_limit;
+    	}
+    }
+	template < typename NumberType >
+    void remove_progress( NumberType prog){
+		if( prog < 0){ add_progress(-prog);};
+        if(ticks==0){
+            reset();//try to reduce impact of any setup/allocation on ticks/sec
+        }
+	    IntType dist_from_limit = ticks - 0;
+	    if( prog <= dist_from_limit ){
+	    	ticks = ticks - prog;
+	    } else {
+	    	ticks = 0;
+	    }
+    }
 
     void display() const
     {
-        float progress = (float) ticks / total_ticks;
-        int pos = (int) (bar_width * progress);
+	    double progress = static_cast<double>(ticks) / static_cast<double>(total_ticks);
+	    IntType pos = (IntType) (bar_width * progress);
 
         std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
         auto time_elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now-start_time).count();
 
-        std::cout << "[";
+        double seconds = static_cast<double>(time_elapsed) / 1000.0;
+	    double ticks_per_second = static_cast<double>(ticks) / seconds;
+	    double remaining_ticks = total_ticks - ticks;
+	    double total_seconds_rem = remaining_ticks / ticks_per_second;
 
-        for (int i = 0; i < bar_width; ++i) {
-            if (i < pos) std::cout << complete_char;
-            else if (i == pos) std::cout << ">";
-            else std::cout << incomplete_char;
+	    std::stringstream ss;
+	    ss << "\033[2K" << "\r";
+        ss << "[";
+
+        for (IntType i = 0; i < bar_width; ++i) {
+            if (i < pos) ss << complete_char;
+            else if (i == pos) ss << ">";
+            else ss << incomplete_char;
         }
-        std::cout << "] " << int(progress * 100.0) << "% "
-                  << float(time_elapsed) / 1000.0 << "s\r";
-        std::cout.flush();
+
+
+
+	    ss << "] " << static_cast<IntType>(progress * 100.0) << "% ";
+
+	    ss << ticks << " / " << total_ticks << " ticks ";
+
+	    ProgressBar::output_time(ss, seconds);
+
+	    ss<<" {";
+        if(ticks) {
+            ProgressBar::output_time(ss, total_seconds_rem);
+        } else {
+            ss << "??:??:??";
+        }
+
+	    ss <<" remaining}";
+
+	    ss<<" (" << static_cast<std::size_t>(ticks ? ticks_per_second : 0.0) << " t/s)";
+
+	    std::cout<< ss.str() << std::flush;
     }
 
     void done() const
@@ -47,6 +158,11 @@ public:
         display();
         std::cout << std::endl;
     }
+	
+	void reset() {
+		start_time = std::chrono::steady_clock::now();
+		ticks = 0;
+	}
 };
 
 #endif //PROGRESSBAR_PROGRESSBAR_HPP
