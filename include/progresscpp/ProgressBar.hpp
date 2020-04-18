@@ -1,9 +1,9 @@
-#ifndef PROGRESSBAR_PROGRESSBAR_HPP
-#define PROGRESSBAR_PROGRESSBAR_HPP
+#pragma once
 
 #include <chrono>
 #include <iostream>
 
+namespace progresscpp {
 class ProgressBar {
 private:
     unsigned int ticks = 0;
@@ -16,19 +16,18 @@ private:
 
 public:
     ProgressBar(unsigned int total, unsigned int width, char complete, char incomplete) :
-            total_ticks {total}, bar_width {width}, complete_char {complete}, incomplete_char {incomplete} {}
+            total_ticks{total}, bar_width{width}, complete_char{complete}, incomplete_char{incomplete} {}
 
-    ProgressBar(unsigned int total, unsigned int width) : total_ticks {total}, bar_width {width} {}
+    ProgressBar(unsigned int total, unsigned int width) : total_ticks{total}, bar_width{width} {}
 
     unsigned int operator++() { return ++ticks; }
 
-    void display() const
-    {
+    void display() const {
         float progress = (float) ticks / total_ticks;
         int pos = (int) (bar_width * progress);
 
         std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-        auto time_elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now-start_time).count();
+        auto time_elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - start_time).count();
 
         std::cout << "[";
 
@@ -42,11 +41,9 @@ public:
         std::cout.flush();
     }
 
-    void done() const
-    {
+    void done() const {
         display();
         std::cout << std::endl;
     }
 };
-
-#endif //PROGRESSBAR_PROGRESSBAR_HPP
+}

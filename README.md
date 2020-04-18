@@ -41,7 +41,7 @@ The above code results in the following output
 ```
 
 ### Example
-Refer to [main.cpp](main.cpp) file for an example usage. To run it,
+Refer to [main.cpp](example/src/example.cpp) file for an example usage. To run it,
 
 ```
 $ mkdir build && cd build
@@ -56,5 +56,5 @@ $ g++ -O3 -I. main.cpp -Wall -std=c++11 -o ProgressBar
 $ ./ProgressBar
 ```
 
-### License
-MIT
+### CMake configuration
+Cmake and project layout is inspired by [github.com/TheLartians/ModernCppStarter](https://github.com/TheLartians/ModernCppStarter).
