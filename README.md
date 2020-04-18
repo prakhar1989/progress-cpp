@@ -41,7 +41,7 @@ The above code results in the following output
 ```
 
 ### Example
-Refer to [main.cpp](example/src/example.cpp) file for an example usage. To run it,
+Refer to [example.cpp](example/src/example.cpp) file for an example usage. To run it,
 
 ```
 $ mkdir build && cd build
