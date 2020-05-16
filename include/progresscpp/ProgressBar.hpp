@@ -22,7 +22,7 @@ public:
 
     unsigned int operator++() { return ++ticks; }
 
-    void display() const {
+    void display() {
         float progress = (float) ticks / total_ticks;
         int pos = (int) (bar_width * progress);
 
