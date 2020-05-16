@@ -41,7 +41,7 @@ public:
         std::cout.flush();
     }
 
-    void done() const {
+    void done() {
         ticks = total_ticks; // can never go beyound 100% for a task
         display();
         std::cout << std::endl;
