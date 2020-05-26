@@ -22,7 +22,7 @@ public:
 
     unsigned int operator++() { return ++ticks; }
 
-    void display() const {
+    void display() {
         float progress = (float) ticks / total_ticks;
         int pos = (int) (bar_width * progress);
 
@@ -31,7 +31,7 @@ public:
 
         std::cout << "[";
 
-        for (int i = 0; i < bar_width; ++i) {
+        for (long i = 0; i < long(bar_width); ++i) {
             if (i < pos) std::cout << complete_char;
             else if (i == pos) std::cout << ">";
             else std::cout << incomplete_char;
@@ -41,7 +41,8 @@ public:
         std::cout.flush();
     }
 
-    void done() const {
+    void done() {
+        ticks = total_ticks; // can never go beyound 100% for a task
         display();
         std::cout << std::endl;
     }
