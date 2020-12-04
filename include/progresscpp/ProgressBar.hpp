@@ -2,11 +2,13 @@
 
 #include <chrono>
 #include <iostream>
+#include <mutex>
 
 namespace progresscpp {
 class ProgressBar {
 private:
     unsigned int ticks = 0;
+    mutable std::mutex mtx;
 
     const unsigned int total_ticks;
     const unsigned int bar_width;
@@ -20,7 +22,10 @@ public:
 
     ProgressBar(unsigned int total, unsigned int width) : total_ticks{total}, bar_width{width} {}
 
-    unsigned int operator++() { return ++ticks; }
+    unsigned int operator++() {
+    	std::unique_lock<std::mutex> lck (mtx);
+        return ++ticks;
+    }
 
     void display() const {
         float progress = (float) ticks / total_ticks;
@@ -29,6 +34,7 @@ public:
         std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
         auto time_elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - start_time).count();
 
+    	std::unique_lock<std::mutex> lck (mtx); // stdout must be accessed in mutual exclusion
         std::cout << "[";
 
         for (int i = 0; i < bar_width; ++i) {
