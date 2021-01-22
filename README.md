@@ -1,5 +1,35 @@
-Progress-CPP
+Progress-CPP-Throttled-HeaderOnly
 ===
+
+
+
+### What's better, TLDR
+
+By printing progress bar only when it is needed, performance got better.
+
+Added ETA(Estimated time of arrival), and Spinner.
+
+It is just one header file, like original.
+
+
+
+## What's new, and why.
+
+### Throttling added
+
+Displaying progress is important, but when printing too much console from your program, your program slows down. That's what exactly happened to me when using original library. So I added throttling feature, to print the progress bar only when it is needed. When `throttle_progress` is set to 1(default), then program will display the progress bar only when percentage changes. If we set `throttle_progress` larger than 1, then it will skip printing progress bar until added progress percentage gets larger than `throttle_progress` .
+
+### ETA added
+
+Time estimation is added. It can be enabled/disabled by variable `is_eta_enabled`
+
+### Spinner added
+
+Spinner is added. It can be enabled/disabled by variable `is_spinner_enabled`
+
+
+
+## Original README of Progress-CPP
 
 A flexible ASCII progress bar for your console based C++ projects.
 
