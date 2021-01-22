@@ -32,6 +32,9 @@ private:
     int count_display = 0;
 
 public:
+    bool is_displayed = false;
+
+public:
     ProgressBar(unsigned int total, unsigned int width, char complete, char incomplete, int throttle, bool is_eta) :
             total_ticks{total}, bar_width{width}, complete_char{complete}, incomplete_char{incomplete}, throttle_progress{throttle}, is_eta_enabled{is_eta} {}
 
@@ -47,7 +50,7 @@ public:
     void _display() const {
     }
 
-    void display() {
+    bool display() {
         float progress = (float) (ticks+1) / total_ticks;
         int curr_progress_percent = ceil(100 * progress);
         bool is_print = false;
@@ -120,11 +123,16 @@ public:
             std::cout << " \r";
             std::cout.flush();
 
+            is_displayed = true;
             count_display++;
+        }else{
+            is_displayed = false;
         }
 
         //save status
         prev_progress_percent = curr_progress_percent;
+
+        return is_displayed;
     }
 
     void done() {
