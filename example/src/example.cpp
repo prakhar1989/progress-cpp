@@ -1,5 +1,11 @@
 #include <iostream>
-#include <unistd.h>
+
+#ifdef _WIN32
+#include <windows.h>
+#else
+//#include <unistd.h>
+#endif
+
 #include "progresscpp/ProgressBar.hpp"
 
 /* Example usage of ProgressBar */
@@ -16,7 +22,11 @@ int main() {
     for (int i = 0; i < total; i++) {
         ++progressBar; // record the tick
 
+#ifdef _WIN32
+        Sleep(2);
+#else
         usleep(200); // simulate work
+#endif
 
         // display the bar only at certain steps
         if (i % 10 == 0)
