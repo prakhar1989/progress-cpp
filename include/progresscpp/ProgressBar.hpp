@@ -8,6 +8,7 @@
 #include <chrono>
 #include <iostream>
 #include <math.h>
+#include <iomanip>
 
 namespace progresscpp {
 class ProgressBar {
@@ -20,14 +21,19 @@ private:
     const char incomplete_char = ' ';
     const std::chrono::steady_clock::time_point start_time = std::chrono::steady_clock::now();
 
+public:
+    int throttle_progress = 5;
+    bool is_eta_enabled = true;
+    bool is_spinner_enabled = true;
+
 private:
     int prev_progress_percent = 0;
-    int throttle_progress = 5;
     int throttle_counter = 0;
+    int count_display = 0;
 
 public:
-    ProgressBar(unsigned int total, unsigned int width, char complete, char incomplete, int throttle) :
-            total_ticks{total}, bar_width{width}, complete_char{complete}, incomplete_char{incomplete}, throttle_progress{throttle} {}
+    ProgressBar(unsigned int total, unsigned int width, char complete, char incomplete, int throttle, bool is_eta) :
+            total_ticks{total}, bar_width{width}, complete_char{complete}, incomplete_char{incomplete}, throttle_progress{throttle}, is_eta_enabled{is_eta} {}
 
     ProgressBar(unsigned int total, unsigned int width, char complete, char incomplete) :
             total_ticks{total}, bar_width{width}, complete_char{complete}, incomplete_char{incomplete} {}
@@ -37,10 +43,6 @@ public:
     ProgressBar(unsigned int total) : total_ticks{total} {}
 
     unsigned int operator++() { return ++ticks; }
-    
-    void UnsetThrottle(){
-        throttle_progress = 0;
-    }
 
     void _display() const {
     }
@@ -56,16 +58,15 @@ public:
         }
         //if limit is set,
         else if(prev_progress_percent > 0){
-
             //detect percentage change
             if(prev_progress_percent < curr_progress_percent){
-                throttle_counter++;
-            }
+                ++throttle_counter;
 
-            //when throttle exceeds, then print and reset the counter.
-            if(throttle_counter >= throttle_progress){
-                is_print = true;
-                throttle_counter = 0;
+                //when throttle exceeds, then print and reset the counter.
+                if(throttle_counter >= throttle_progress){
+                    is_print = true;
+                    throttle_counter = 0;
+                }
             }
         }
 
@@ -82,9 +83,44 @@ public:
                 else if (i == pos) std::cout << ">";
                 else std::cout << incomplete_char;
             }
-            std::cout << "] " << int(progress * 100.0) << "% "
-                      << float(time_elapsed) / 1000.0 << "s\r";
+            std::cout << "] ";
+
+            std::cout << "[" << int(progress * 100.0) << "% ";
+            std::cout << std::fixed << std::setprecision(2) << float(time_elapsed) / 1000.0 << "s";
+            std::cout << "]";
+
+            if(is_eta_enabled){
+                float expected = float(time_elapsed) / progress;
+                float eta = abs(expected - time_elapsed);
+                std::cout << " eta " <<  std::fixed << std::setprecision(2) << float(eta) / 1000.0 << "s ";
+            }
+
+            if(is_spinner_enabled){
+                //followed character spinner style of etaprogress(python)
+                //@ref https://pypi.org/project/etaprogress/
+                const int total_pinchar = 4;
+                int idx_spinchar = count_display % total_pinchar;
+                char spinchar = ' ';
+                switch(idx_spinchar){
+                    case 0:
+                        spinchar = '-'; break;
+                    case 1:
+                        spinchar = '\\'; break;
+                    case 2:
+                        spinchar = '|'; break;
+                    case 3:
+                        spinchar = '/'; break;
+                    default:
+                        break;
+                }
+                std::cout << " " <<  spinchar;
+            }
+
+
+            std::cout << " \r";
             std::cout.flush();
+
+            count_display++;
         }
 
         //save status

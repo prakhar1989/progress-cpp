@@ -23,9 +23,9 @@ int main() {
         ++progressBar; // record the tick
 
 #ifdef _WIN32
-        Sleep(2);
+        Sleep(1);
 #else
-        usleep(200); // simulate work
+        usleep(100); // simulate work
 #endif
 
         // display the bar only at certain steps
