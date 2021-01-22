@@ -1,9 +1,7 @@
 Progress-CPP-Throttled-HeaderOnly
 ===
 
-
-
-### What's better, TLDR
+## What's new, TLDR
 
 By printing progress bar only when it is needed, performance got better.
 
@@ -13,7 +11,7 @@ It is just one header file, like original.
 
 
 
-## What's new, and why.
+## What's new and why, in detail
 
 ### Throttling added
 
