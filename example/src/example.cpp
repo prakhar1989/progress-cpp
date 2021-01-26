@@ -29,8 +29,7 @@ int main() {
 #endif
 
         // display the bar only at certain steps
-        if (i % 10 == 0)
-            progressBar.display();
+        progressBar.display();
     }
 
     // tell the bar to finish

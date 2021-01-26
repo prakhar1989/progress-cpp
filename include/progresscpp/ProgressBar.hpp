@@ -67,8 +67,8 @@ public:
 
                 //when throttle exceeds, then print and reset the counter.
                 if(throttle_counter >= throttle_progress){
-                    is_print = true;
                     throttle_counter = 0;
+                    is_print = true;
                 }
             }
         }
